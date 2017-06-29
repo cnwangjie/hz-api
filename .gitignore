@@ -1,4 +1,5 @@
 src/main/resources/application.yaml
+static
 
 target/
 !.mvn/wrapper/maven-wrapper.jar

@@ -2,11 +2,15 @@ package com.lf.hz.model;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
-import java.util.*;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 public class Article {
 
     @Id
@@ -22,18 +26,22 @@ public class Article {
     @Column(columnDefinition = "varchar(100) COMMENT '显示的创建人'")
     private String author;
 
-    @ManyToMany(mappedBy = "articles")
-    private Set<Cate> cates;
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name="article_cate",
+            joinColumns = {@JoinColumn(name = "article_id")},
+            inverseJoinColumns = {@JoinColumn(name = "cate_id")})
+    private Set<Cate> cates = new HashSet<Cate>();
 
-    @ManyToMany(mappedBy = "articles")
-    private Set<Cate> tags;
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name="article_tag",
+            joinColumns = {@JoinColumn(name = "article_id")},
+            inverseJoinColumns = {@JoinColumn(name = "tag_id")})
+    private Set<Tag> tags;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at", nullable = true)
     @CreatedDate
     private Date createdAt;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "updated_at", nullable = true)
     @LastModifiedDate
     private Date updatedAt;
@@ -78,6 +86,14 @@ public class Article {
         this.cates = cates;
     }
 
+    public Set<Tag> getTags() {
+        return tags;
+    }
+
+    public void setTags(Set<Tag> tags) {
+        this.tags = tags;
+    }
+
     public Date getCreatedAt() {
         return createdAt;
     }
@@ -93,5 +109,4 @@ public class Article {
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
     }
-
 }

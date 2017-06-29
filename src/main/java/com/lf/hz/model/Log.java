@@ -1,11 +1,13 @@
 package com.lf.hz.model;
 
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.util.Date;
 
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 public class Log {
 
     @Id
@@ -21,7 +23,6 @@ public class Log {
     @Column(columnDefinition = "varchar(255) COMMENT '用户访问的路径'")
     private String page;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @CreatedDate
     private Date time;
 

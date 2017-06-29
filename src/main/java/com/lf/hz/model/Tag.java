@@ -1,7 +1,9 @@
 package com.lf.hz.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -9,6 +11,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 public class Tag {
 
     @Id
@@ -18,18 +21,14 @@ public class Tag {
     @Column(columnDefinition = "varchar(100) COMMENT '标签名'")
     private String name;
 
-    @ManyToMany(cascade = CascadeType.MERGE)
-    @JoinTable(name="article_tag",
-            joinColumns = {@JoinColumn(name = "tag_id", referencedColumnName = "id")},
-            inverseJoinColumns = {@JoinColumn(name = "article_id", referencedColumnName = "id")})
+    @JsonIgnore
+    @ManyToMany(mappedBy = "cates", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Article> articles = new HashSet<Article>();
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at", nullable = true)
     @CreatedDate
     private Date createdAt;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "updated_at", nullable = true)
     @LastModifiedDate
     private Date updatedAt;

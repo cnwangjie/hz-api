@@ -21,16 +21,16 @@ public class ArticleController {
         this.articleRepository = articleRepository;
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public ResponseEntity get(@PathVariable Integer id) {
-        return new ResponseEntity(articleRepository.findOneById(id), HttpStatus.OK);
-    }
-
     @RequestMapping(value = "/lastest", method = RequestMethod.GET)
     public ResponseEntity index(@RequestParam(value = "page", defaultValue = "0") Integer page,
                                 @RequestParam(value = "size", defaultValue = "10") Integer size) {
         List articles = articleRepository.findAll(new PageRequest(page, size,
-                new Sort(Sort.Direction.DESC, "created_at"))).getContent();
+                new Sort(Sort.Direction.DESC, "createdAt"))).getContent();
         return new ResponseEntity(articles, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    public ResponseEntity get(@PathVariable Integer id) {
+        return new ResponseEntity(articleRepository.findOneById(id), HttpStatus.OK);
     }
 }

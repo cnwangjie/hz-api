@@ -19,4 +19,5 @@ server:
     port: 2002
 
 config:
+    debug: true
     resouces-path: /home/wangjie/Workspace/hz/static/
