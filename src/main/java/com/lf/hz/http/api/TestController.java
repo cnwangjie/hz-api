@@ -1,10 +1,7 @@
 package com.lf.hz.http.api;
 
 import com.lf.hz.config.Config;
-import com.lf.hz.model.Article;
-import com.lf.hz.model.Cate;
-import com.lf.hz.model.Resource;
-import com.lf.hz.model.Tag;
+import com.lf.hz.model.*;
 import com.lf.hz.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -36,18 +33,21 @@ public class TestController {
     private final PageRepository pageRepository;
     private final ResourceRepository resourceRepository;
     private final TagRepository tagRepository;
+    private final NavRepository navRepository;
 
     @Inject
     public TestController(ArticleRepository articleRepository,
                           CateRepository cateRepository,
                           PageRepository pageRepository,
                           ResourceRepository resourceRepository,
-                          TagRepository tagRepository) {
+                          TagRepository tagRepository,
+                          NavRepository navRepository) {
         this.articleRepository = articleRepository;
         this.cateRepository = cateRepository;
         this.pageRepository = pageRepository;
         this.resourceRepository = resourceRepository;
         this.tagRepository = tagRepository;
+        this.navRepository = navRepository;
     }
 
 
@@ -100,7 +100,7 @@ public class TestController {
         }
 
         File testStaticPic = new File(config.getResoucesPath() + "pic.jpg");
-        if (testStaticPic.exists()) {
+        if (testStaticPic.exists() && resourceRepository.count() == 0) {
             Resource pic = new Resource();
             pic.setName(testStaticPic.getName());
             String uuid = UUID.randomUUID().toString();
@@ -126,6 +126,19 @@ public class TestController {
                 out.close();
             }
             resourceRepository.save(pic);
+        }
+
+        if (navRepository.count() == 0) {
+            Nav nav0 = new Nav();
+            nav0.setLink("/");
+            nav0.setName("home");
+            nav0.setTitle("首页");
+            navRepository.save(nav0);
+
+            Nav nav1 = new Nav();
+            nav1.setLink("#");
+            nav1.setTitle("not active");
+            navRepository.save(nav1);
         }
 
         return new ResponseEntity("Success", HttpStatus.OK);

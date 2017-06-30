@@ -23,7 +23,7 @@ public class Article {
     @Column(columnDefinition = "text", nullable = true)
     private String content;
 
-    @Column(columnDefinition = "varchar(100) COMMENT '显示的创建人'")
+    @Column(columnDefinition = "varchar(100) COMMENT '显示的创建人'", nullable = true)
     private String author;
 
     @ManyToMany(cascade = CascadeType.ALL)
