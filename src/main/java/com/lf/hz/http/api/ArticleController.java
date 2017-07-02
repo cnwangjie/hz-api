@@ -33,4 +33,12 @@ public class ArticleController {
     public ResponseEntity get(@PathVariable Integer id) {
         return new ResponseEntity(articleRepository.findOneById(id), HttpStatus.OK);
     }
+
+    @RequestMapping(value = "/search", method = RequestMethod.GET)
+    public ResponseEntity search(@RequestParam(value = "word", defaultValue = "") String word) {
+        if (word == "") {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity(articleRepository.findByContentContaining(word), HttpStatus.OK);
+    }
 }
