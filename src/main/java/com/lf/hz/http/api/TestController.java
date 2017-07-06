@@ -8,18 +8,16 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.inject.Inject;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/test")
@@ -28,28 +26,29 @@ public class TestController {
     @Autowired
     private Config config;
 
-    private final ArticleRepository articleRepository;
-    private final CateRepository cateRepository;
-    private final PageRepository pageRepository;
-    private final ResourceRepository resourceRepository;
-    private final TagRepository tagRepository;
-    private final NavRepository navRepository;
+    @Autowired
+    private ArticleRepository articleRepository;
 
-    @Inject
-    public TestController(ArticleRepository articleRepository,
-                          CateRepository cateRepository,
-                          PageRepository pageRepository,
-                          ResourceRepository resourceRepository,
-                          TagRepository tagRepository,
-                          NavRepository navRepository) {
-        this.articleRepository = articleRepository;
-        this.cateRepository = cateRepository;
-        this.pageRepository = pageRepository;
-        this.resourceRepository = resourceRepository;
-        this.tagRepository = tagRepository;
-        this.navRepository = navRepository;
-    }
+    @Autowired
+    private CateRepository cateRepository;
 
+    @Autowired
+    private PageRepository pageRepository;
+
+    @Autowired
+    private ResourceRepository resourceRepository;
+
+    @Autowired
+    private TagRepository tagRepository;
+
+    @Autowired
+    private NavRepository navRepository;
+
+    @Autowired
+    private AuthorityRepository authorityRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @RequestMapping(value = "")
     public ResponseEntity index() {
@@ -139,6 +138,24 @@ public class TestController {
             nav1.setLink("#");
             nav1.setTitle("not active");
             navRepository.save(nav1);
+        }
+
+        if (authorityRepository.count() == 0) {
+            Authority admin = new Authority();
+            admin.setName(AuthorityName.ROLE_ADMIN);
+            authorityRepository.save(admin);
+        }
+
+        if (userRepository.count() == 0) {
+            User user = new User();
+            user.setUsername("admin");
+            user.setPassword(BCrypt.hashpw("password", BCrypt.gensalt()));
+
+            List authorities = new ArrayList();
+            authorities.add(authorityRepository.getOneByName(AuthorityName.ROLE_ADMIN));
+
+            user.setAuthorities(authorities);
+            userRepository.save(user);
         }
 
         return new ResponseEntity("Success", HttpStatus.OK);

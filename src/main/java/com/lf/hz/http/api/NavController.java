@@ -1,23 +1,18 @@
 package com.lf.hz.http.api;
 
 import com.lf.hz.repository.NavRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.inject.Inject;
-
 @RestController
 @RequestMapping("/api/nav")
 public class NavController {
 
-    private final NavRepository navRepository;
-
-    @Inject
-    public NavController(NavRepository navRepository) {
-        this.navRepository = navRepository;
-    }
+    @Autowired
+    private NavRepository navRepository;
 
     @RequestMapping("")
     public ResponseEntity index() {

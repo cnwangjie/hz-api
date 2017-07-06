@@ -5,6 +5,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -18,9 +19,11 @@ public class Article {
     private Integer id;
 
     @Column(columnDefinition = "varchar(255)")
+    @NotNull
     private String title;
 
     @Column(columnDefinition = "text", nullable = true)
+    @NotNull
     private String content;
 
     @Column(columnDefinition = "varchar(100) COMMENT '显示的创建人'", nullable = true)

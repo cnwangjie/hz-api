@@ -20,4 +20,8 @@ server:
 
 config:
     debug: true
-    resouces-path: /home/wangjie/Workspace/hz/static/
+    resouces:
+        path: /home/wangjie/Workspace/hz/static/
+    jwt:
+        header: Authorization
+        secret: LT3VUBXM79NU1N9B

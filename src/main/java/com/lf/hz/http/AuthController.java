@@ -1,0 +1,64 @@
+package com.lf.hz.http;
+
+import com.lf.hz.config.Config;
+import com.lf.hz.repository.UserRepository;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/auth")
+public class AuthController {
+
+    @Autowired
+    private UserRepository userRepository;
+
+    private org.apache.commons.logging.Log log = LogFactory.getLog(this.getClass());
+
+    @Autowired
+    private Config config;
+
+    @RequestMapping(value = "/login", method = RequestMethod.POST)
+    public ResponseEntity getToken(@RequestParam(value = "username", defaultValue = "") String username,
+                                   @RequestParam(value = "password", defaultValue = "") String password) {
+
+        HashMap json = new HashMap();
+
+        if (!BCrypt.checkpw(password, userRepository.getOneByUsername(username).getPassword())) {
+            json.put("status", "user is not exists or password wrong");
+        } else {
+            Map claims = new HashMap();
+            claims.put("sub", username);
+
+            Date expirationDate = new Date((new Date()).getTime() + 360000000);
+
+            String token = Jwts.builder()
+                    .setClaims(claims)
+                    .setExpiration(expirationDate)
+                    .signWith(SignatureAlgorithm.HS512, config.getJwtSecret())
+                    .compact();
+            json.put("status", "login success");
+            json.put("token", token);
+        }
+        return new ResponseEntity(json, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/test", method = RequestMethod.POST)
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity test() {
+        return new ResponseEntity("success", HttpStatus.OK);
+    }
+}

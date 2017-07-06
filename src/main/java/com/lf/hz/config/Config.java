@@ -9,8 +9,14 @@ public class Config {
     @Value("${config.debug}")
     private Boolean debug;
 
-    @Value("${config.resouces-path}")
+    @Value("${config.resouces.path}")
     private String resoucesPath;
+
+    @Value("${config.jwt.header}")
+    private String jwtHeader;
+
+    @Value("${config.jwt.secret}")
+    private String jwtSecret;
 
     public Boolean getDebug() {
         return debug;
@@ -20,4 +26,11 @@ public class Config {
         return resoucesPath;
     }
 
+    public String getJwtHeader() {
+        return jwtHeader;
+    }
+
+    public String getJwtSecret() {
+        return jwtSecret;
+    }
 }
