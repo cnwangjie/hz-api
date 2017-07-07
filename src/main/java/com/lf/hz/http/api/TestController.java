@@ -135,9 +135,29 @@ public class TestController {
             navRepository.save(nav0);
 
             Nav nav1 = new Nav();
-            nav1.setLink("#");
-            nav1.setTitle("not active");
+            nav1.setLink("");
+            nav1.setTitle("归档");
             navRepository.save(nav1);
+
+            Nav nav2 = new Nav();
+            nav2.setLink("");
+            nav2.setTitle("新闻");
+            navRepository.save(nav2);
+
+            Nav nav3 = new Nav();
+            nav3.setLink("");
+            nav3.setTitle("服务");
+            navRepository.save(nav3);
+
+            Nav nav4 = new Nav();
+            nav4.setLink("");
+            nav4.setTitle("介绍");
+            navRepository.save(nav4);
+
+            Nav nav5 = new Nav();
+            nav5.setLink("");
+            nav5.setTitle("联系");
+            navRepository.save(nav5);
         }
 
         if (authorityRepository.count() == 0) {
