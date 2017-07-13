@@ -13,7 +13,8 @@ spring:
     jpa:
         database: MYSQL
         hibernate.ddl-auto: update
-        #spring.jpa.show-sql: true
+        show-sql: true
+        generate-ddl: true
 
 server:
     port: 2002

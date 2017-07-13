@@ -18,7 +18,7 @@ public class Authority {
     @GeneratedValue
     private Integer id;
 
-    @Column(columnDefinition = "COMMENT '权限名'")
+    @Column(columnDefinition = "varchar(100) COMMENT '权限名'")
     @Enumerated(EnumType.STRING)
     private AuthorityName name;
 
