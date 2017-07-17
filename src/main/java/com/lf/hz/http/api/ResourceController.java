@@ -17,6 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * @apiDefine resource 资源
+ */
+
 @RestController
 @RequestMapping("/api/resource")
 public class ResourceController {
@@ -27,6 +31,16 @@ public class ResourceController {
     @Autowired
     private ResourceRepository resourceRepository;
 
+    /**
+     * @api {get} /api/resource/:filename 静态资源
+     * @apiVersion 0.0.1
+     * @apiGroup resource
+     * @apiParam {String} filename 文章数量
+     *
+     * @apiSuccessExample {json} 成功
+     *      HTTP/1.1 200
+     *
+     */
     @RequestMapping(value = "/{filename:.+}", method = RequestMethod.GET)
     public ResponseEntity resource(@PathVariable String filename) throws IOException{
         Resource resource = resourceRepository.getOneByName(filename);

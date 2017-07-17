@@ -19,6 +19,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @apiDefine auth 认证
+ */
+
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
@@ -31,6 +35,17 @@ public class AuthController {
     @Autowired
     private Config config;
 
+    /**
+     * @api {post} /auth/login 登陆
+     * @apiVersion 0.0.1
+     * @apiGroup auth
+     * @apiParam {String} username 用户名
+     * @apiParam {String} password 密码
+     *
+     * @apiSuccess {String} status 状态
+     * @apiSuccess {String} msg    成功信息
+     * @apiSuccess {String} token  JWT token
+     */
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public ResponseEntity getToken(@RequestParam(value = "username", defaultValue = "") String username,
                                    @RequestParam(value = "password", defaultValue = "") String password) {
@@ -38,7 +53,8 @@ public class AuthController {
         HashMap json = new HashMap();
 
         if (!BCrypt.checkpw(password, userRepository.getOneByUsername(username).getPassword())) {
-            json.put("status", "user is not exists or password wrong");
+            json.put("status", "error");
+            json.put("msg", "user is not exists or password wrong");
         } else {
             Map claims = new HashMap();
             claims.put("sub", username);
@@ -50,12 +66,21 @@ public class AuthController {
                     .setExpiration(expirationDate)
                     .signWith(SignatureAlgorithm.HS512, config.getJwtSecret())
                     .compact();
-            json.put("status", "login success");
+            json.put("status", "success");
+            json.put("msg", "login success");
             json.put("token", token);
         }
         return new ResponseEntity(json, HttpStatus.OK);
     }
 
+    /**
+     * @api {post} /auth/test 身份测试
+     * @apiVersion 0.0.1
+     * @apiGroup auth
+     * @apiHeader Authorization JWT token
+     *
+     * @apiSuccess {String} status 状态
+     */
     @RequestMapping(value = "/test", method = RequestMethod.POST)
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity test() {
