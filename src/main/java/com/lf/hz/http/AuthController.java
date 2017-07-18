@@ -45,6 +45,14 @@ public class AuthController {
      * @apiSuccess {String} status 状态
      * @apiSuccess {String} msg    成功信息
      * @apiSuccess {String} token  JWT token
+     *
+     * @apiSuccessExample {json} 200
+     * {
+     *     "status": "success",
+     *     "msg": "login success",
+     *     "token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTUwMDc0Mzc2N30.glHDV2wRpyd6fQxr_BytWej1pMa7JPKwUSkf9Wmz-eXSeg4QugyHB5MxIEkKSmkc0-70QBWu-kW5bkTJKCybLg"
+     * }
+     *
      */
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public ResponseEntity getToken(@RequestParam(value = "username", defaultValue = "") String username,

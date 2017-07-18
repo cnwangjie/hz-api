@@ -1,0 +1,9 @@
+language: java
+jdk:
+ - oraclejdk8
+service:
+  - mysql
+
+before_install:
+  - mysql -e 'CREATE DATABASE hz;'
+  - cp src/main/resources/application.yaml.tmp src/main/resources/application.yaml
