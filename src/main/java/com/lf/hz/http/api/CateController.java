@@ -28,8 +28,38 @@ public class CateController {
      * @apiVersion 0.0.1
      * @apiGroup cate
      *
-     * @apiSuccessExample {json} 成功
-     *      HTTP/1.1 200
+     * @apiSuccessExample {json} 成功[
+    {
+    "id": 1,
+    "name": "cate 0",
+    "createdAt": 1498741479000,
+    "updatedAt": 1498741479000
+    },
+    {
+    "id": 2,
+    "name": "cate 1",
+    "createdAt": 1498741479000,
+    "updatedAt": 1498741479000
+    },
+    {
+    "id": 3,
+    "name": "cate 2",
+    "createdAt": 1498741479000,
+    "updatedAt": 1498741479000
+    },
+    {
+    "id": 4,
+    "name": "cate 3",
+    "createdAt": 1498741479000,
+    "updatedAt": 1498741479000
+    },
+    {
+    "id": 5,
+    "name": "cate 4",
+    "createdAt": 1498741479000,
+    "updatedAt": 1498741479000
+    }
+    ]
      *
      * @apiErrorExample {json} 404
      *      HTTP/1.1 404 Not Found
@@ -59,6 +89,9 @@ public class CateController {
      * @apiSuccess {Object[]}  articles.tags       标签
      * @apiSuccess {Number}    articles.createdAt  创建时间的时间戳
      * @apiSuccess {Number}    articles.updatedAt  修改时间的时间戳
+     *
+     * @apiUse multiarticle
+     *
      *
      * @apiErrorExample 404
      *      HTTP/1.1 404 Not Found
