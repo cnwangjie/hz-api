@@ -1,8 +1,10 @@
 package com.lf.hz.http.api;
 
 import com.lf.hz.model.Article;
+import com.lf.hz.model.Cate;
 import com.lf.hz.model.Log;
 import com.lf.hz.repository.ArticleRepository;
+import com.lf.hz.repository.CateRepository;
 import com.lf.hz.repository.LogRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -57,7 +59,36 @@ public class ArticleController {
     private ArticleRepository articleRepository;
 
     @Autowired
+    private CateRepository cateRepository;
+
+    @Autowired
     private LogRepository logRepository;
+
+    /**
+     * @api {get} /api/article/all 获取全部文章
+     * @apiPermission ADMIN
+     * @apiHeader Authorization JWT token
+     * @apiVersion 0.0.1
+     * @apiGroup article
+     * @apiSuccess {Object[]} articles 文章列表
+     * @apiSuccess {Number}    articles.id         id
+     * @apiSuccess {String}    articles.title      标题
+     *
+     */
+    @RequestMapping(value = "/all", method = RequestMethod.GET)
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity all() {
+        List articles = articleRepository.findAll();
+        List json = new ArrayList();
+        for (int i = 0; i < articles.size(); i++) {
+            Map obj = new HashMap();
+            Article a = (Article) articles.get(i);
+            obj.put("id", a.getId());
+            obj.put("title", a.getTitle());
+            json.add(obj);
+        }
+        return new ResponseEntity(json, HttpStatus.OK);
+    }
 
     /**
      * @api {get} /api/article/lastest 获取最新的文章列表
@@ -190,6 +221,47 @@ public class ArticleController {
     }
 
     /**
+     * @api {post} /api/article/:id/edit 修改文章
+     * @apiPermission ADMIN
+     * @apiHeader Authorization JWT token
+     * @apiVersion 0.0.1
+     * @apiGroup article
+     * @apiParam {String} [title] 标题
+     * @apiParam {String} [content] 内容
+     * @apiParam {String} [author] 作者
+     * @apiSuccess {Number}    id         id
+     * @apiSuccess {String}    title      标题
+     * @apiSuccess {String}    content    内容 (html)
+     * @apiSuccess {String}    author     作者 (单纯用于显示)
+     * @apiSuccess {Object[]}  cates      分类
+     * @apiSuccess {Object[]}  tags       标签
+     * @apiSuccess {Number}    createdAt  创建时间的时间戳
+     * @apiSuccess {Number}    updatedAt  修改时间的时间戳
+     *
+     */
+    @RequestMapping(value = "/{id}/edit", method = RequestMethod.POST)
+    @PreAuthorize(value = "hasRole('ADMIN')")
+    public ResponseEntity update(@PathVariable(value = "id") Integer id,
+                                 @RequestParam(value = "title", required = true) String title,
+                                 @RequestParam(value = "content", required = true) String content,
+                                 @RequestParam(value = "author", required = false) String author) {
+        Article article = articleRepository.findOneById(id);
+        if (article == null) {
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        }
+
+        if (title != null) article.setTitle(title);
+        if (author != null) article.setAuthor(author);
+        if (content != null) article.setContent(content);
+        try {
+            articleRepository.save(article);
+        } catch (Exception e) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity(article, HttpStatus.OK);
+    }
+
+    /**
      * @api {post} /api/article/:id/delete 删除文章
      * @apiPermission ADMIN
      * @apiHeader Authorization JWT token
@@ -205,6 +277,114 @@ public class ArticleController {
     public ResponseEntity delete(@PathVariable(value = "id") Integer id) {
         articleRepository.delete((long) id);
         return new ResponseEntity(HttpStatus.OK);
+    }
+
+    /**
+     * @api {post} /api/article/:id/cate/add 给文章添加分类
+     * @apiPermission ADMIN
+     * @apiHeader Authorization JWT token
+     * @apiVersion 0.0.1
+     * @apiGroup article
+     * @apiParam {Number} id 文章id
+     * @apiParam {Number} cate_id 分类id
+     *
+     * @apiSuccess {String} status 状态
+     * @apiSuccess {String} msg 信息
+     * @apiSuccess {Number} id 文章id
+     * @apiSuccess {Number} cate_id 分类id
+     *
+     * @apiError {String} status 状态
+     * @apiError {String} error 错误种类
+     * @apiError {String} msg 错误信息
+     *
+     */
+    @RequestMapping(value = "/{id}/cate/add", method = RequestMethod.POST)
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity addCate(@PathVariable(value = "id") Integer article_id,
+                                  @RequestParam(value = "cate_id", required = true) Integer cate_id) {
+        Article article = articleRepository.findOneById(article_id);
+
+        Map json = new HashMap();
+        if (article == null) {
+            json.put("status", "error");
+            json.put("error", "ArticleError");
+            json.put("msg", "article is not exist");
+            return new ResponseEntity(json, HttpStatus.OK);
+        }
+
+        Cate cate = cateRepository.getOneById(cate_id);
+        if (cate == null) {
+            json.put("status", "error");
+            json.put("error", "CateError");
+            json.put("msg", "cate is not exist");
+            return new ResponseEntity(json, HttpStatus.OK);
+        }
+
+        Set cates = article.getCates();
+        cates.add(cate);
+        article.setCates(cates);
+        articleRepository.save(article);
+
+
+        json.put("status", "success");
+        json.put("msg", "add article to cate");
+        json.put("article_id", article_id);
+        json.put("cate_id", cate_id);
+        return new ResponseEntity(json, HttpStatus.OK);
+    }
+
+    /**
+     * @api {post} /api/article/:id/cate/remove 给文章删除分类
+     * @apiPermission ADMIN
+     * @apiHeader Authorization JWT token
+     * @apiVersion 0.0.1
+     * @apiGroup article
+     * @apiParam {Number} id 文章id
+     * @apiParam {Number} cate_id 分类id
+     *
+     * @apiSuccess {String} status 状态
+     * @apiSuccess {String} msg 信息
+     * @apiSuccess {Number} id 文章id
+     * @apiSuccess {Number} cate_id 分类id
+     *
+     * @apiError {String} status 状态
+     * @apiError {String} error 错误种类
+     * @apiError {String} msg 错误信息
+     *
+     */
+    @RequestMapping(value = "/{id}/cate/remove", method = RequestMethod.POST)
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity removeCate(@PathVariable(value = "id") Integer article_id,
+                                  @RequestParam(value = "cate_id", required = true) Integer cate_id) {
+        Article article = articleRepository.findOneById(article_id);
+
+        Map json = new HashMap();
+        if (article == null) {
+            json.put("status", "error");
+            json.put("error", "ArticleError");
+            json.put("msg", "article is not exist");
+            return new ResponseEntity(json, HttpStatus.OK);
+        }
+
+        Cate cate = cateRepository.getOneById(cate_id);
+        if (cate == null) {
+            json.put("status", "error");
+            json.put("error", "CateError");
+            json.put("msg", "cate is not exist");
+            return new ResponseEntity(json, HttpStatus.OK);
+        }
+
+        Set cates = article.getCates();
+        cates.remove(cate);
+        article.setCates(cates);
+        articleRepository.save(article);
+
+
+        json.put("status", "success");
+        json.put("msg", "add article to cate");
+        json.put("article_id", article_id);
+        json.put("cate_id", cate_id);
+        return new ResponseEntity(json, HttpStatus.OK);
     }
 
     /**

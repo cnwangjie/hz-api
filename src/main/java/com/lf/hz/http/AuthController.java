@@ -55,10 +55,11 @@ public class AuthController {
      *
      */
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public ResponseEntity getToken(@RequestParam(value = "username", defaultValue = "") String username,
-                                   @RequestParam(value = "password", defaultValue = "") String password) {
+    public ResponseEntity getToken(@RequestParam(value = "username", required = true) String username,
+                                   @RequestParam(value = "password", required = true) String password) {
 
         HashMap json = new HashMap();
+
 
         if (!BCrypt.checkpw(password, userRepository.getOneByUsername(username).getPassword())) {
             json.put("status", "error");

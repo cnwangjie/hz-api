@@ -1,7 +1,7 @@
 package com.lf.hz.http.api;
 
-import com.lf.hz.model.Cate;
-import com.lf.hz.repository.CateRepository;
+import com.lf.hz.model.Tag;
+import com.lf.hz.repository.TagRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,49 +13,50 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @apiDefine cate 分类
+ * @apiDefine tag 标签
  */
 
 @RestController
-@RequestMapping("/api/cate")
-public class CateController {
+@RequestMapping("/api/tag")
+public class TagController {
 
     @Autowired
-    private CateRepository cateRepository;
+    private TagRepository tagRepository;
 
     /**
-     * @api {get} /api/cate/all 获取全部分类
+     * @api {get} /api/tag/all 获取全部标签
      * @apiVersion 0.0.1
-     * @apiGroup cate
+     * @apiGroup tag
      *
-     * @apiSuccessExample {json} 成功[
+     * @apiSuccessExample {json} 成功
+     * [
     {
     "id": 1,
-    "name": "cate 0",
+    "name": "tag 0",
     "createdAt": 1498741479000,
     "updatedAt": 1498741479000
     },
     {
     "id": 2,
-    "name": "cate 1",
+    "name": "tag 1",
     "createdAt": 1498741479000,
     "updatedAt": 1498741479000
     },
     {
     "id": 3,
-    "name": "cate 2",
+    "name": "tag 2",
     "createdAt": 1498741479000,
     "updatedAt": 1498741479000
     },
     {
     "id": 4,
-    "name": "cate 3",
+    "name": "tag 3",
     "createdAt": 1498741479000,
     "updatedAt": 1498741479000
     },
     {
     "id": 5,
-    "name": "cate 4",
+    "name": "tag 4",
     "createdAt": 1498741479000,
     "updatedAt": 1498741479000
     }
@@ -65,20 +66,20 @@ public class CateController {
      *      HTTP/1.1 404 Not Found
      *      {
      *          "status": "error",
-     *          "error": "CateError",
-     *          "msg": "this cate is not exist"
+     *          "error": "TagError",
+     *          "msg": "this tag is not exist"
      *      }
      */
     @RequestMapping("/all")
     public ResponseEntity all() {
-        return new ResponseEntity(cateRepository.findAll(), HttpStatus.OK);
+        return new ResponseEntity(tagRepository.findAll(), HttpStatus.OK);
     }
 
     /**
-     * @api {get} /api/cate/:id 获取一个分类下的所有文章
+     * @api {get} /api/tag/:id 获取一个具有一个标签的所有文章
      * @apiVersion 0.0.1
-     * @apiGroup cate
-     * @apiParam {Number} id 分类id
+     * @apiGroup tag
+     * @apiParam {Number} id 标签id
      *
      * @apiSuccess {Object[]}  articles 文章列表
      * @apiSuccess {Number}    articles.id         id
@@ -99,15 +100,15 @@ public class CateController {
      */
     @RequestMapping("/{id}")
     public ResponseEntity get(@PathVariable Integer id) {
-        Cate cate = cateRepository.getOneById(id);
-        if (cate == null) {
+        Tag tag = tagRepository.getOneById(id);
+        if (tag == null) {
             Map json = new HashMap();
             json.put("status", "error");
-            json.put("error", "CateError");
-            json.put("msg", "this cate is not exist");
+            json.put("error", "TagError");
+            json.put("msg", "this tag is not exist");
             return new ResponseEntity(json, HttpStatus.NOT_FOUND);
         } else {
-            return new ResponseEntity(cate.getArticles(), HttpStatus.OK);
+            return new ResponseEntity(tag.getArticles(), HttpStatus.OK);
         }
     }
 }

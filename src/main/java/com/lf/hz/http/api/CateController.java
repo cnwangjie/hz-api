@@ -5,8 +5,10 @@ import com.lf.hz.repository.CateRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
@@ -28,7 +30,8 @@ public class CateController {
      * @apiVersion 0.0.1
      * @apiGroup cate
      *
-     * @apiSuccessExample {json} 成功[
+     * @apiSuccessExample {json} 成功
+     * [
     {
     "id": 1,
     "name": "cate 0",
@@ -109,5 +112,48 @@ public class CateController {
         } else {
             return new ResponseEntity(cate.getArticles(), HttpStatus.OK);
         }
+    }
+
+    /**
+     * @api {get} /api/cate/add 增加新的分类
+     * @apiVersion 0.0.1
+     * @apiGroup cate
+     * @apiParam {String} name 分类名
+     *
+     * @apiSuccess {Object[]}  articles 文章列表
+     * @apiSuccess {Number}    articles.id         id
+     * @apiSuccess {String}    articles.title      标题
+     * @apiSuccess {String}    articles.content    内容 (html)
+     * @apiSuccess {String}    articles.author     作者 (单纯用于显示)
+     * @apiSuccess {Object[]}  articles.cates      分类
+     * @apiSuccess {Object[]}  articles.tags       标签
+     * @apiSuccess {Number}    articles.createdAt  创建时间的时间戳
+     * @apiSuccess {Number}    articles.updatedAt  修改时间的时间戳
+     *
+     * @apiError {String} status 状态
+     * @apiError {String} msg 错误信息
+     *
+     */
+    @RequestMapping("/add")
+    @PreAuthorize(value = "hasRole('ADMIN')")
+    public ResponseEntity add(@RequestParam(value = "name", required = true) String name) {
+        Map json = new HashMap();
+        if (name == null) {
+            json.put("status", "error");
+            json.put("msg", "need name param");
+            return new ResponseEntity(json, HttpStatus.BAD_REQUEST);
+        }
+        if (cateRepository.getOneByName(name) != null) {
+            json.put("status", "error");
+            json.put("msg", "cate is exist");
+            return new ResponseEntity(json, HttpStatus.OK);
+        }
+
+        Cate cate = new Cate();
+        cate.setName(name);
+
+        cateRepository.save(cate);
+
+        return new ResponseEntity(cate, HttpStatus.OK);
     }
 }
