@@ -1,5 +1,6 @@
 package com.lf.hz.http.filter;
 
+import com.lf.hz.config.Config;
 import com.lf.hz.model.Log;
 import com.lf.hz.repository.LogRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,9 @@ public class LogFilter implements Filter {
     @Autowired
     private LogRepository logRepository;
 
+    @Autowired
+    private Config config;
+
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) req;
 
@@ -24,9 +28,10 @@ public class LogFilter implements Filter {
         }
         Log log = new Log();
         log.setUa(request.getHeader("User-Agent"));
-        log.setIp(request.getRemoteHost());
+        String ip = request.getHeader("X-Real-IP");
+        log.setIp(ip != null ? ip : request.getRemoteHost());
         log.setPage(request.getRequestURI());
-        logRepository.save(log);
+        if (config.getDebug() || ip != "127.0.0.1") logRepository.save(log);
         chain.doFilter(req, res);
     }
 

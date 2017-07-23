@@ -1,4 +1,4 @@
-package com.lf.hz.Service;
+package com.lf.hz.service;
 
 import com.lf.hz.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;

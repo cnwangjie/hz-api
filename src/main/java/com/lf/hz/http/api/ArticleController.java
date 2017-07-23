@@ -212,11 +212,7 @@ public class ArticleController {
         article.setTitle(title);
         article.setContent(content);
         article.setAuthor(author);
-        try {
-            articleRepository.save(article);
-        } catch (Exception e) {
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
-        }
+        articleRepository.save(article);
         return new ResponseEntity(article, HttpStatus.OK);
     }
 
@@ -275,7 +271,7 @@ public class ArticleController {
     @RequestMapping(value = "/{id}/delete", method = RequestMethod.POST)
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity delete(@PathVariable(value = "id") Integer id) {
-        articleRepository.delete((long) id);
+        articleRepository.deleteById(id);
         return new ResponseEntity(HttpStatus.OK);
     }
 
