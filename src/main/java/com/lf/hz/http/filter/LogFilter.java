@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Component
@@ -21,17 +22,20 @@ public class LogFilter implements Filter {
 
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) req;
-
+        HttpServletResponse response = (HttpServletResponse) res;
         if (!request.getMethod().equalsIgnoreCase("GET")) {
             chain.doFilter(req, res);
             return;
         }
+
         Log log = new Log();
         log.setUa(request.getHeader("User-Agent"));
         String ip = request.getHeader("X-Real-IP");
         log.setIp(ip != null ? ip : request.getRemoteHost());
         log.setPage(request.getRequestURI());
+
         if (config.getDebug() || ip != "127.0.0.1") logRepository.save(log);
+
         chain.doFilter(req, res);
     }
 
