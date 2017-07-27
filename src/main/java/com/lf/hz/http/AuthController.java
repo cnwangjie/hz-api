@@ -1,6 +1,7 @@
 package com.lf.hz.http;
 
 import com.lf.hz.config.Config;
+import com.lf.hz.model.User;
 import com.lf.hz.repository.UserRepository;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -46,24 +47,25 @@ public class AuthController {
      * @apiSuccess {String} msg    成功信息
      * @apiSuccess {String} token  JWT token
      *
-     * @apiSuccessExample {json} 200
+     * @apiSuccessExample {json} 成功
      * {
      *     "status": "success",
      *     "msg": "login success",
      *     "token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTUwMDc0Mzc2N30.glHDV2wRpyd6fQxr_BytWej1pMa7JPKwUSkf9Wmz-eXSeg4QugyHB5MxIEkKSmkc0-70QBWu-kW5bkTJKCybLg"
      * }
-     *
      */
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public ResponseEntity getToken(@RequestParam(value = "username", required = true) String username,
                                    @RequestParam(value = "password", required = true) String password) {
 
         HashMap json = new HashMap();
-
-
-        if (!BCrypt.checkpw(password, userRepository.getOneByUsername(username).getPassword())) {
+        User user = userRepository.getOneByUsername(username);
+        if (user == null) {
             json.put("status", "error");
-            json.put("msg", "user is not exists or password wrong");
+            json.put("msg", "user is not exist");
+        } else if (!BCrypt.checkpw(password, user.getPassword())) {
+            json.put("status", "error");
+            json.put("msg", "user password wrong");
         } else {
             Map claims = new HashMap();
             claims.put("sub", username);

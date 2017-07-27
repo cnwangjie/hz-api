@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 public class UAVerifier implements HandlerInterceptor {
 
     public boolean preHandle(HttpServletRequest req, HttpServletResponse res, Object o) throws Exception {
-        String ua = res.getHeader("User-Agent");
+        String ua = req.getHeader("User-Agent");
         if (ua != null) return true;
 
         res.setStatus(400);
