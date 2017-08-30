@@ -11,5 +11,5 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
     void deleteById(Integer id);
     Article findOneById(Integer id);
 
-    List findByContentContaining(String word0);
+    List findByTitleContaining(String word0);
 }

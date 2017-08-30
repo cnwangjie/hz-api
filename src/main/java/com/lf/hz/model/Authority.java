@@ -24,6 +24,7 @@ public class Authority {
 
     @JsonIgnore
     @ManyToMany(mappedBy = "authorities", fetch = FetchType.EAGER)
+    @Column(nullable = false)
     private Set<User> users = new HashSet<User>();
 
     @Column(name = "created_at", nullable = true)

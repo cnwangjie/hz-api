@@ -18,11 +18,11 @@ public class Article {
     @GeneratedValue
     private Integer id;
 
-    @Column(columnDefinition = "varchar(255)")
+    @Column(columnDefinition = "varchar(255)", nullable = false)
     @NotNull
     private String title;
 
-    @Column(columnDefinition = "text", nullable = true)
+    @Column(columnDefinition = "text", nullable = false)
     @NotNull
     private String content;
 

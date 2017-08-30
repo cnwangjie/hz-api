@@ -183,7 +183,7 @@ public class ArticleController {
         if (word == "") {
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity(articleRepository.findByContentContaining(word), HttpStatus.OK);
+        return new ResponseEntity(articleRepository.findByTitleContaining(word), HttpStatus.OK);
     }
 
     /**
