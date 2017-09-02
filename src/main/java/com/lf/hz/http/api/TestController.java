@@ -8,6 +8,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -58,6 +59,7 @@ public class TestController {
     }
 
     @RequestMapping(value = "/seed")
+    @PreAuthorize(value = "hasRole('ADMIN')")
     public ResponseEntity seed() throws IOException {
         if (!config.getDebug()) {
             return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
