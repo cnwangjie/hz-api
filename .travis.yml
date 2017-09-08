@@ -1,7 +1,21 @@
 language: java
+
+sudo: true
+
+addons:
+  ssh_known_hosts:
+    - www.cnwangjie.com
+
 service:
   - mysql
 
 before_install:
   - mysql -e 'CREATE DATABASE hz;'
   - cp src/main/resources/application.yaml.tmp src/main/resources/application.yaml
+
+after_success:
+  - sudo apt-get update
+  - sudo apt-get install sshpass
+  - npm install apidoc --global
+  - apidoc
+  - sshpass -p $DOC_UPLOAD_PASSWORD scp ./doc/api_data.js root@www.cnwangjie.com:/var/www/html/hz-api-doc/api_data.js

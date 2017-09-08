@@ -7,7 +7,9 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.bcrypt.BCrypt;
@@ -95,6 +97,8 @@ public class AuthController {
     @RequestMapping(value = "/test", method = RequestMethod.POST)
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity test() {
-        return new ResponseEntity("success", HttpStatus.OK);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.valueOf("application/json"));
+        return new ResponseEntity("{\"status\": \"Success!\"}", headers, HttpStatus.OK);
     }
 }
