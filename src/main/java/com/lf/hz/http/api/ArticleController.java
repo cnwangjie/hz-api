@@ -83,7 +83,15 @@ public class ArticleController {
         for (int i = 0; i < articles.size(); i++) {
             Map obj = new HashMap();
             Article a = (Article) articles.get(i);
+
+            Set<Cate> detailCates = a.getCates();
+            Set cateIds = new HashSet();
+            for (Cate cate : detailCates) {
+                cateIds.add(cate.getId());
+            }
+
             obj.put("id", a.getId());
+            obj.put("cates", cateIds);
             obj.put("title", a.getTitle());
             json.add(obj);
         }
@@ -192,7 +200,10 @@ public class ArticleController {
      * @apiHeader Authorization JWT token
      * @apiVersion 0.0.1
      * @apiGroup article
-     * @apiParam {String} word 关键词
+     * @apiParam {String} title 标题
+     * @apiParam {String} content 内容 (html)
+     * @apiParam {String} [author] 作者
+     * @apiParam {String} [cates] 分类id (多个用英文逗号分隔)
      * @apiSuccess {Number}    id         id
      * @apiSuccess {String}    title      标题
      * @apiSuccess {String}    content    内容 (html)
@@ -207,11 +218,21 @@ public class ArticleController {
     @PreAuthorize(value = "hasRole('ADMIN')")
     public ResponseEntity add(@RequestParam(value = "title", required = true) String title,
                               @RequestParam(value = "content", required = true) String content,
-                              @RequestParam(value = "author", required = false) String author) {
+                              @RequestParam(value = "author", required = false) String author,
+                              @RequestParam(value = "cates", required = false) String cates) {
         Article article = new Article();
         article.setTitle(title);
         article.setContent(content);
-        article.setAuthor(author);
+        if (author != null) article.setAuthor(author);
+        if (cates != null) {
+            Set toSetCates = new HashSet();
+            String[] cateIds = cates.split(",");
+            for (int i = 0; i < cateIds.length; i++) {
+                Cate cate = cateRepository.getOneById(Integer.parseInt(cateIds[i]));
+                toSetCates.add(cate);
+            }
+            article.setCates(toSetCates);
+        }
         articleRepository.save(article);
         return new ResponseEntity(article, HttpStatus.OK);
     }
@@ -225,6 +246,7 @@ public class ArticleController {
      * @apiParam {String} [title] 标题
      * @apiParam {String} [content] 内容
      * @apiParam {String} [author] 作者
+     * @apiParam {String} [cates] 分类id (多个用英文逗号分隔)
      * @apiSuccess {Number}    id         id
      * @apiSuccess {String}    title      标题
      * @apiSuccess {String}    content    内容 (html)
@@ -240,7 +262,8 @@ public class ArticleController {
     public ResponseEntity update(@PathVariable(value = "id") Integer id,
                                  @RequestParam(value = "title", required = true) String title,
                                  @RequestParam(value = "content", required = true) String content,
-                                 @RequestParam(value = "author", required = false) String author) {
+                                 @RequestParam(value = "author", required = false) String author,
+                                 @RequestParam(value = "cates", required = false) String cates) {
         Article article = articleRepository.findOneById(id);
         if (article == null) {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
@@ -249,6 +272,15 @@ public class ArticleController {
         if (title != null) article.setTitle(title);
         if (author != null) article.setAuthor(author);
         if (content != null) article.setContent(content);
+        if (cates != null) {
+            Set toSetCates = new HashSet();
+            String[] cateIds = cates.split(",");
+            for (int i = 0; i < cateIds.length; i++) {
+                Cate cate = cateRepository.getOneById(Integer.parseInt(cateIds[i]));
+                toSetCates.add(cate);
+            }
+            article.setCates(toSetCates);
+        }
         try {
             articleRepository.save(article);
         } catch (Exception e) {

@@ -112,12 +112,12 @@ public class ResourceController {
     }
 
     /**
-     * @api {post} /api/resource/upload 上传静态资源
+     * @api {post} /api/resource/mkdir 创建目录
      * @apiPermission ADMIN
      * @apiHeader Authorization JWT token
      * @apiVersion 0.0.1
      * @apiGroup resource
-     * @apiParam {String} [path=/] 要上传到的目录
+     * @apiParam {String} [path=/] 父目录
      * @apiParam {String} name 目录名
      *
      * @apiSuccess {String} status 状态
