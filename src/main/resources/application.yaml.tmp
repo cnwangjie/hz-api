@@ -15,6 +15,10 @@ spring:
         hibernate.ddl-auto: update
         show-sql: true
         generate-ddl: true
+    http:
+      multipart:
+        max-file-size: 2048MB
+        max-request-size: 2048MB
 
 server:
     port: 2002
