@@ -13,12 +13,11 @@ import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.channels.FileChannel;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/test")
@@ -100,34 +99,34 @@ public class TestController {
             articleRepository.save(a);
         }
 
-        File testStaticPic = new File(config.getResoucesPath() + "pic.jpg");
-        if (testStaticPic.exists() && resourceRepository.count() == 0) {
-            Resource pic = new Resource();
-            pic.setName(testStaticPic.getName());
-            String uuid = UUID.randomUUID().toString();
-            pic.setUuid(uuid);
-            pic.setType("image/jpg");
-            File newFile = new File(config.getResoucesPath() + uuid);
-            FileChannel in = null;
-            FileChannel out = null;
-            FileInputStream inStream = null;
-            FileOutputStream outStream = null;
-            try {
-                inStream = new FileInputStream(testStaticPic);
-                outStream = new FileOutputStream(newFile);
-                in = inStream.getChannel();
-                out = outStream.getChannel();
-                in.transferTo(0, in.size(), out);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                inStream.close();
-                outStream.close();
-                in.close();
-                out.close();
-            }
-            resourceRepository.save(pic);
-        }
+//        File testStaticPic = new File(config.getResoucesPath() + "pic.jpg");
+//        if (testStaticPic.exists() && resourceRepository.count() == 0) {
+//            Resource pic = new Resource();
+//            pic.setName(testStaticPic.getName());
+//            String uuid = UUID.randomUUID().toString();
+//            pic.setUuid(uuid);
+//            pic.setType("image/jpg");
+//            File newFile = new File(config.getResoucesPath() + uuid);
+//            FileChannel in = null;
+//            FileChannel out = null;
+//            FileInputStream inStream = null;
+//            FileOutputStream outStream = null;
+//            try {
+//                inStream = new FileInputStream(testStaticPic);
+//                outStream = new FileOutputStream(newFile);
+//                in = inStream.getChannel();
+//                out = outStream.getChannel();
+//                in.transferTo(0, in.size(), out);
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            } finally {
+//                inStream.close();
+//                outStream.close();
+//                in.close();
+//                out.close();
+//            }
+//            resourceRepository.save(pic);
+//        }
 
         if (navRepository.count() == 0) {
             Nav nav0 = new Nav();

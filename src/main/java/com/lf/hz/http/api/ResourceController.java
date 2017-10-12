@@ -1,6 +1,7 @@
 package com.lf.hz.http.api;
 
 import com.lf.hz.config.Config;
+import com.lf.hz.model.Resource;
 import com.lf.hz.repository.ResourceRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -102,8 +103,24 @@ public class ResourceController {
             json.put("msg", "file is empty");
             return new ResponseEntity(json, HttpStatus.BAD_REQUEST);
         }
+
+        String relativeFilePath = Paths.get(path, file.getOriginalFilename()).toString();
+
+        if (relativeFilePath.charAt(0) == '/') {
+            relativeFilePath = relativeFilePath.substring(1);
+        }
+
+        Resource resource = resourceRepository.getOneByPath(relativeFilePath);
+        if (resource == null) {
+            resource = new Resource();
+        }
+
         Path toSaveFilePath = Paths.get(listPath.getAbsolutePath().toString(), file.getOriginalFilename());
         Files.write(toSaveFilePath, file.getBytes());
+
+        resource.setName(toSaveFilePath.getFileName().toString());
+        resource.setPath(relativeFilePath);
+        resourceRepository.save(resource);
 
         json.put("status", "success");
         json.put("msg", "upload successfully");
@@ -154,5 +171,59 @@ public class ResourceController {
         json.put("msg", "make directory successfully");
         json.put("path", dir.getAbsolutePath().substring(config.getResoucesPath().length()));
         return new ResponseEntity(json, HttpStatus.OK);
+    }
+
+    /**
+     * @api {get} /api/resource/get 获取一个资源的属性
+     * @apiVersion 0.0.1
+     * @apiGroup resource
+     * @apiParam {String} path 相对路径
+     *
+     * @apiSuccess {Number} id 资源id
+     * @apiSuccess {String} name 文件名
+     * @apiSuccess {String} path 相对路径
+     * @apiSuccess {String} link 资源跳转到的链接
+     * @apiSuccess {String} description 资源描述
+     */
+    @RequestMapping(value = "/get", method = RequestMethod.GET)
+    public ResponseEntity get(@RequestParam(value = "path", required = true) String path) {
+        Resource resource = resourceRepository.getOneByPath(path);
+        if (resource == null) {
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity(resource, HttpStatus.OK);
+    }
+
+    /**
+     * @api {get} /api/resource/edit-info 设置一个资源的属性
+     * @apiVersion 0.0.1
+     * @apiGroup resource
+     * @apiParam {String} path 相对路径
+     * @apiParam {String} [description] 资源描述
+     * @apiParam {String} [link] 资源跳转到的链接
+     *
+     * @apiSuccess {Number} id 资源id
+     * @apiSuccess {String} name 文件名
+     * @apiSuccess {String} path 相对路径
+     * @apiSuccess {String} link 资源跳转到的链接
+     * @apiSuccess {String} description 资源描述
+     */
+    @RequestMapping(value = "/edit-info", method = RequestMethod.POST)
+    @PreAuthorize(value = "hasRole('ADMIN')")
+    public ResponseEntity editInfo(@RequestParam(value = "path", required = true) String path,
+                                   @RequestParam(value = "description", required = false) String description,
+                                   @RequestParam(value = "link", required = false) String link) {
+        Resource resource = resourceRepository.getOneByPath(path);
+        if (resource == null) {
+            resource = new Resource();
+            resource.setPath(path);
+            resource.setName(Paths.get(path).getFileName().toString());
+        }
+
+        if (description != null) resource.setDescription(description);
+        if (link != null) resource.setLink(link);
+        resourceRepository.save(resource);
+        return new ResponseEntity(resource, HttpStatus.OK);
     }
 }

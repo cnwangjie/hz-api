@@ -5,6 +5,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @Entity
@@ -15,14 +16,19 @@ public class Resource {
     @GeneratedValue
     private Integer id;
 
-    @Column(columnDefinition = "varchar(100) COMMENT '文件的content-type'")
-    private String type;
-
-    @Column(columnDefinition = "char(36) COMMENT '文件对应的UUID'", unique = true)
-    private String uuid;
-
-    @Column(columnDefinition = "varchar(255) COMMENT '文件名'", unique = true)
+    @Column(columnDefinition = "varchar(255) COMMENT '文件名'")
+    @NotNull
     private String name;
+
+    @Column(columnDefinition = "varchar(255) COMMENT '文件路径'", unique = true)
+    @NotNull
+    private String path;
+
+    @Column(columnDefinition = "varchar(255) COMMENT '资源跳转到的链接'")
+    private String link;
+
+    @Column(columnDefinition = "varchar(255) COMMENT '资源描述'")
+    private String description;
 
     @Column(name = "created_at", nullable = true)
     @CreatedDate
@@ -40,28 +46,36 @@ public class Resource {
         this.id = id;
     }
 
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public String getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
-
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    public String getLink() {
+        return link;
+    }
+
+    public void setLink(String link) {
+        this.link = link;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public Date getCreatedAt() {
