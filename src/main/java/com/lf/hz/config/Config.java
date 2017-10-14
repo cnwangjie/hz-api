@@ -9,6 +9,9 @@ public class Config {
     @Value("${config.debug}")
     private Boolean debug;
 
+    @Value("${config.host}")
+    private String host;
+
     @Value("${config.resouces.path}")
     private String resoucesPath;
 
@@ -20,6 +23,10 @@ public class Config {
 
     public Boolean getDebug() {
         return debug;
+    }
+
+    public String getHost() {
+        return host;
     }
 
     public String getResoucesPath() {

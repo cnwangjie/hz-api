@@ -39,8 +39,6 @@ public class ResourceController {
 
     /**
      * @api {get} /api/resource/list 获取所有静态资源
-     * @apiPermission ADMIN
-     * @apiHeader Authorization JWT token
      * @apiVersion 0.0.1
      * @apiGroup resource
      * @apiParam {String} [path=/] 目录
@@ -49,7 +47,6 @@ public class ResourceController {
      *
      */
     @RequestMapping(value = "/list", method = RequestMethod.GET)
-    @PreAuthorize(value = "hasRole('ADMIN')")
     public ResponseEntity resource(@RequestParam(value = "path", defaultValue = "/") String path) {
         Path resourcePath = Paths.get(config.getResoucesPath());
         File listPath = new File(Paths.get(resourcePath.toString(), path).toString());
@@ -59,14 +56,20 @@ public class ResourceController {
             json.put("msg", "path not a directory or path not exists");
             return new ResponseEntity(json, HttpStatus.FORBIDDEN);
         }
+        String host = config.getHost();
+
         ArrayList files = new ArrayList();
         for (File f : listPath.listFiles()) {
             HashMap file = new HashMap();
+            String relativePath = f.getAbsolutePath().substring(config.getResoucesPath().length());
             file.put("name", f.getName());
             file.put("size", f.length());
             file.put("modified", f.lastModified());
-            file.put("path", f.getAbsolutePath().substring(config.getResoucesPath().length()));
+            file.put("path", relativePath);
             file.put("isdir", f.isDirectory());
+            if (!f.isDirectory()) {
+                file.put("url", Paths.get(host, "resource", relativePath).toString());
+            }
             files.add(file);
         }
         return new ResponseEntity(files, HttpStatus.OK);
