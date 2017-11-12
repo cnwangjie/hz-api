@@ -66,9 +66,14 @@ public class ResourceController {
             file.put("size", f.length());
             file.put("modified", f.lastModified());
             file.put("path", relativePath);
+            Resource resource = resourceRepository.getOneByPath(relativePath);
+            if (resource != null) {
+                file.put("link", resource.getLink());
+                file.put("description", resource.getDescription());
+            }
             file.put("isdir", f.isDirectory());
             if (!f.isDirectory()) {
-                file.put("url", Paths.get(host, "resource", relativePath).toString());
+                file.put("url", host + '/' + Paths.get("resource", relativePath).toString());
             }
             files.add(file);
         }

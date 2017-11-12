@@ -18,6 +18,9 @@ public class Article {
     @GeneratedValue
     private Integer id;
 
+    @Column(columnDefinition = "varchar(255)")
+    private String image;
+
     @Column(columnDefinition = "varchar(255)", nullable = false)
     @NotNull
     private String title;
@@ -55,6 +58,14 @@ public class Article {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 
     public String getTitle() {
