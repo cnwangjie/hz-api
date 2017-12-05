@@ -31,3 +31,7 @@ config:
     jwt:
         header: Authorization # JWT请求头
         secret: LT3VUBXM79NU1N9B # JWT secret
+    tts:
+        appid:
+        apikey:
+        secretkey:

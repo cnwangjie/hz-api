@@ -3,6 +3,7 @@ package com.lf.hz.http.api;
 import com.lf.hz.config.Config;
 import com.lf.hz.model.Resource;
 import com.lf.hz.repository.ResourceRepository;
+import com.lf.hz.service.TTSService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -36,6 +38,9 @@ public class ResourceController {
 
     @Autowired
     private ResourceRepository resourceRepository;
+
+    @Autowired
+    private TTSService ttsService;
 
     /**
      * @api {get} /api/resource/list 获取所有静态资源
@@ -233,5 +238,24 @@ public class ResourceController {
         if (link != null) resource.setLink(link);
         resourceRepository.save(resource);
         return new ResponseEntity(resource, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/tts", method = RequestMethod.POST)
+    public ResponseEntity tts(@RequestParam(value = "articleid", required = false) Integer id,
+                              @RequestParam(value = "text", required = false) String text) throws IOException, NoSuchAlgorithmException {
+        HashMap json = new HashMap();
+        if (text != null) {
+            json.put("status", "success");
+            json.put("soundpath", ttsService.getTextSound(text));
+            return new ResponseEntity(json, HttpStatus.OK);
+        } else if (id != null) {
+            json.put("status", "success");
+            json.put("soundpath", ttsService.getArticleSound(id));
+            return new ResponseEntity(json, HttpStatus.OK);
+        } else {
+            json.put("status", "error");
+            json.put("msg", "BAD REQUEST");
+            return new ResponseEntity(json, HttpStatus.BAD_REQUEST);
+        }
     }
 }

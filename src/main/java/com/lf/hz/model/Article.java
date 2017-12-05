@@ -80,6 +80,12 @@ public class Article {
         return content;
     }
 
+    public String getInnerText() {
+        String content = getContent();
+        String text = content.replaceAll("</?[^>]+>", "").replaceAll("\\s*|\t|\r|\n", "");
+        return text;
+    }
+
     public void setContent(String content) {
         this.content = content;
     }

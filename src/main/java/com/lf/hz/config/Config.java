@@ -21,6 +21,15 @@ public class Config {
     @Value("${config.jwt.secret}")
     private String jwtSecret;
 
+    @Value("${config.tts.appid}")
+    private String ttsAppid;
+
+    @Value("${config.tts.apikey}")
+    private String ttsApikey;
+
+    @Value("${config.tts.secretkey}")
+    private String ttsSecretkey;
+
     public Boolean getDebug() {
         return debug;
     }
@@ -40,4 +49,17 @@ public class Config {
     public String getJwtSecret() {
         return jwtSecret;
     }
+
+    public String getTtsAppid() {
+        return ttsAppid;
+    }
+
+    public String getTtsApikey() {
+        return ttsApikey;
+    }
+
+    public String getTtsSecretkey() {
+        return ttsSecretkey;
+    }
+
 }
