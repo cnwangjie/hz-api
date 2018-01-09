@@ -3,9 +3,12 @@ package com.lf.hz.http.api;
 import com.lf.hz.model.Article;
 import com.lf.hz.model.Cate;
 import com.lf.hz.model.Log;
+import com.lf.hz.model.Resource;
 import com.lf.hz.repository.ArticleRepository;
 import com.lf.hz.repository.CateRepository;
 import com.lf.hz.repository.LogRepository;
+import com.lf.hz.repository.ResourceRepository;
+import com.lf.hz.service.ResourceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -63,6 +66,12 @@ public class ArticleController {
 
     @Autowired
     private LogRepository logRepository;
+
+    @Autowired
+    private ResourceRepository resourceRepository;
+
+    @Autowired
+    private ResourceService resourceService;
 
     /**
      * @api {get} /api/article/all 获取全部文章
@@ -163,6 +172,57 @@ public class ArticleController {
             json.put("status", "error");
             json.put("msg", "not found");
             return new ResponseEntity(json, HttpStatus.NOT_FOUND);
+        }
+    }
+
+    /**
+     * @api {get} /api/article/:id/image 获取链接到该文章的图片资源
+     * @apiVersion 0.0.1
+     * @apiGroup article
+     * @apiParam {Number} id id
+     * @apiSuccess {Object[]}  images 图片列表
+     * @apiSuccess {Number} images.id id
+     * @apiSuccess {String} images.path 路径
+     * @apiSuccess {String} images.name 名称
+     * @apiSuccess {String} images.description  描述
+     * @apiSuccess {String} images.url  URL直链
+     *
+     * @apiSuccessExample {json} 200
+     *      [
+    {
+    "path": "photo/徽州宗族/Screenshot from 2017-09-15 16-44-38.png",
+    "name": "Screenshot from 2017-09-15 16-44-38.png",
+    "description": "aaa",
+    "id": 9,
+    "url": "http://127.0.0.1:2002/resource/photo/徽州宗族/Screenshot from 2017-09-15 16-44-38.png"
+    }
+    ]
+     *
+     * @apiError (404) {String} status 状态
+     * @apiError (404) {String} msg 错误信息
+     */
+
+    @RequestMapping(value = "/{id}/image", method = RequestMethod.GET)
+    public ResponseEntity getArticleImage(@PathVariable Integer id) {
+        Article article = articleRepository.findOneById(id);
+        if (article == null) {
+            Map json = new HashMap();
+            json.put("status", "error");
+            json.put("msg", "article not exists");
+            return new ResponseEntity(json, HttpStatus.NOT_FOUND);
+        } else {
+            List<Resource> resources = resourceRepository.findByLink(Integer.toString(id));
+            ArrayList files = new ArrayList();
+            for (Resource r : resources) {
+                HashMap file = new HashMap();
+                file.put("id", r.getId());
+                file.put("name", r.getName());
+                file.put("path", r.getPath());
+                file.put("url", resourceService.getURLByRelativePath(r.getPath()));
+                file.put("description", r.getDescription());
+                files.add(file);
+            }
+            return new ResponseEntity(files, HttpStatus.OK);
         }
     }
 

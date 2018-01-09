@@ -3,6 +3,7 @@ package com.lf.hz.http.api;
 import com.lf.hz.config.Config;
 import com.lf.hz.model.Resource;
 import com.lf.hz.repository.ResourceRepository;
+import com.lf.hz.service.ResourceService;
 import com.lf.hz.service.TTSService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +43,9 @@ public class ResourceController {
     @Autowired
     private TTSService ttsService;
 
+    @Autowired
+    private ResourceService resourceService;
+
     /**
      * @api {get} /api/resource/list 获取所有静态资源
      * @apiVersion 0.0.1
@@ -53,15 +57,13 @@ public class ResourceController {
      */
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public ResponseEntity resource(@RequestParam(value = "path", defaultValue = "/") String path) {
-        Path resourcePath = Paths.get(config.getResoucesPath());
-        File listPath = new File(Paths.get(resourcePath.toString(), path).toString());
+        File listPath = resourceService.getLocalFileByPath(path);
         if (!listPath.isDirectory()) {
             HashMap json = new HashMap();
             json.put("status", "error");
             json.put("msg", "path not a directory or path not exists");
             return new ResponseEntity(json, HttpStatus.FORBIDDEN);
         }
-        String host = config.getHost();
 
         ArrayList files = new ArrayList();
         for (File f : listPath.listFiles()) {
@@ -78,7 +80,7 @@ public class ResourceController {
             }
             file.put("isdir", f.isDirectory());
             if (!f.isDirectory()) {
-                file.put("url", host + '/' + Paths.get("resource", relativePath).toString());
+                file.put("url", resourceService.getURLByRelativePath(relativePath));
             }
             files.add(file);
         }
@@ -103,8 +105,7 @@ public class ResourceController {
                                  @RequestParam(value = "path", defaultValue = "/", required = false) String path) throws IOException {
         HashMap json = new HashMap();
 
-        Path resourcePath = Paths.get(config.getResoucesPath());
-        File listPath = new File(Paths.get(resourcePath.toString(), path).toString());
+        File listPath = resourceService.getLocalFileByPath(path);
         if (!listPath.isDirectory()) {
             json.put("status", "error");
             json.put("msg", "path not a directory or path not exists");
@@ -161,8 +162,7 @@ public class ResourceController {
 
         HashMap json = new HashMap();
 
-        Path resourcePath = Paths.get(config.getResoucesPath());
-        File listPath = new File(Paths.get(resourcePath.toString(), path).toString());
+        File listPath = resourceService.getLocalFileByPath(path);
         if (!listPath.isDirectory()) {
             json.put("status", "error");
             json.put("msg", "path not a directory or path not exists");
