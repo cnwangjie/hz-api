@@ -32,13 +32,13 @@ public class Article {
     @Column(columnDefinition = "varchar(100) COMMENT '显示的创建人'", nullable = true)
     private String author;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany
     @JoinTable(name="article_cate",
             joinColumns = {@JoinColumn(name = "article_id")},
             inverseJoinColumns = {@JoinColumn(name = "cate_id")})
     private Set<Cate> cates = new HashSet<Cate>();
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany
     @JoinTable(name="article_tag",
             joinColumns = {@JoinColumn(name = "article_id")},
             inverseJoinColumns = {@JoinColumn(name = "tag_id")})
