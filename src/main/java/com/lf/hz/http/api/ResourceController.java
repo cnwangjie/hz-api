@@ -98,6 +98,7 @@ public class ResourceController {
      *
      * @apiSuccess {String} status 状态
      * @apiSuccess {String} path 上传到的路径
+     * @apiSuccess {Object} resource 上传的资源对象
      */
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
     @PreAuthorize(value = "hasRole('ADMIN')")
@@ -138,6 +139,7 @@ public class ResourceController {
 
         json.put("status", "success");
         json.put("msg", "upload successfully");
+        json.put("resource", resource);
         json.put("file", toSaveFilePath.toString().substring(config.getResoucesPath().length()));
         return new ResponseEntity(json, HttpStatus.OK);
     }
@@ -238,6 +240,33 @@ public class ResourceController {
         if (link != null) resource.setLink(link);
         resourceRepository.save(resource);
         return new ResponseEntity(resource, HttpStatus.OK);
+    }
+
+    /**
+     * @api {get} /api/resource/delete 删除一个资源
+     * @apiVersion 0.0.1
+     * @apiGroup resource
+     * @apiParam {String} path 相对路径
+     *
+     * @apiSuccess {String} status 状态
+     * @apiSuccess {String} msg 信息
+     */
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
+    @PreAuthorize(value = "hasRole('ADMIN')")
+    public ResponseEntity delete(@RequestParam(value = "path", required = true) String path) {
+        Resource resource = resourceRepository.getOneByPath(path);
+        HashMap json = new HashMap();
+        if (resource == null) {
+            json.put("status", "error");
+            json.put("msg", "not exists");
+        }
+
+        File file = resourceService.getLocalFileByPath(path);
+        file.delete();
+        resourceRepository.delete(resource);
+        json.put("status", "success");
+        json.put("msg", "delete success");
+        return new ResponseEntity(json, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/tts", method = RequestMethod.POST)
