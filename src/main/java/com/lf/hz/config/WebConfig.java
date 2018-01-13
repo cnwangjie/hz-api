@@ -1,5 +1,6 @@
 package com.lf.hz.config;
 
+import com.lf.hz.http.filter.IpVerifier;
 import com.lf.hz.http.filter.UAVerifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -22,6 +23,11 @@ public class WebConfig extends WebMvcConfigurerAdapter {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new UAVerifier()).addPathPatterns("/**");
+
+        if (config.isRestrictIntranet())
+            registry.addInterceptor(new IpVerifier())
+                    .addPathPatterns("/**")
+                    .excludePathPatterns("/error");
     }
 
     @Override

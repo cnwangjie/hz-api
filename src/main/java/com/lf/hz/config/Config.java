@@ -30,6 +30,9 @@ public class Config {
     @Value("${config.tts.secretkey}")
     private String ttsSecretkey;
 
+    @Value("${config.restrict-intranet}")
+    private boolean restrictIntranet;
+
     public Boolean getDebug() {
         return debug;
     }
@@ -60,6 +63,14 @@ public class Config {
 
     public String getTtsSecretkey() {
         return ttsSecretkey;
+    }
+
+    public boolean isRestrictIntranet() {
+        return restrictIntranet;
+    }
+
+    public void setRestrictIntranet(boolean restrictIntranet) {
+        this.restrictIntranet = restrictIntranet;
     }
 
 }

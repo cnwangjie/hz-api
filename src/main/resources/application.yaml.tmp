@@ -23,6 +23,12 @@ spring:
 server:
     port: 2002
 
+logging:
+  level:
+    org:
+      springframework:
+        web: INFO
+
 config:
     debug: true # 开放调试用接口且在终端显示详细日志
     host: http://127.0.0.1:2002 # app的地址
@@ -31,7 +37,8 @@ config:
     jwt:
         header: Authorization # JWT请求头
         secret: LT3VUBXM79NU1N9B # JWT secret
-    tts:
+    tts: # 百度语音合成接口信息
         appid:
         apikey:
         secretkey:
+    restrict-intranet: false # 限制只能内网访问
