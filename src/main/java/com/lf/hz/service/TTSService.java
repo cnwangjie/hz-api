@@ -38,7 +38,7 @@ public class TTSService {
 
     protected String getSoundResourcePath(String filename) {
         String relativePath = new File(getSoundPathByFilename(filename)).getAbsolutePath().substring(config.getResoucesPath().length());
-        return config.getHost() + '/' + Paths.get("sound", relativePath).toString();
+        return config.getHost() + '/' + Paths.get("resource", relativePath).toString();
     }
 
     public String getArticleSound(Integer id) throws IOException {
@@ -57,7 +57,7 @@ public class TTSService {
     public String getTextSound(String text) throws NoSuchAlgorithmException, IOException {
         MessageDigest md = MessageDigest.getInstance("MD5");
         md.update(text.getBytes());
-        String filename = "text" + new BigInteger(1, md.digest()).toString(16) + ".mp3";
+        String filename = "text" + new BigInteger(1, md.digest()).toString(16);
         if (!soundExists(filename)) {
             getSound(text, filename);
         }
@@ -69,6 +69,7 @@ public class TTSService {
 
         String toSaveFilePath = getSoundPathByFilename(filename);
 
+        Logger logger = Logger.getLogger(this.getClass().toString());
         FileOutputStream fos = new FileOutputStream(toSaveFilePath, true);
         while (text.length() > 0) {
             String tmpText = text.substring(0, text.length() < 1000 ? text.length() : 1000);
@@ -81,10 +82,9 @@ public class TTSService {
                 fos.write(res.getData());
             } else {
                 if (result != null) {
-                    Logger logger = Logger.getLogger(this.getClass().toString());
-                    logger.info(tmpText);
-                    logger.info(result.get("err_no").toString());
-                    logger.info(result.get("err_msg").toString());
+                    logger.warning(tmpText);
+                    logger.warning(result.get("err_no").toString());
+                    logger.warning(result.get("err_msg").toString());
                 }
                 break;
             }
