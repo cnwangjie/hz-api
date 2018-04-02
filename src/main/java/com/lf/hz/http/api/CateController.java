@@ -2,6 +2,7 @@ package com.lf.hz.http.api;
 
 import com.lf.hz.model.Cate;
 import com.lf.hz.repository.CateRepository;
+import com.lf.hz.service.ResourceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,6 +27,9 @@ public class CateController {
 
     @Autowired
     private CateRepository cateRepository;
+
+    @Autowired
+    private ResourceService resourceService;
 
     /**
      * @api {get} /api/cate/all 获取全部分类
@@ -116,19 +122,14 @@ public class CateController {
 
     /**
      * @api {get} /api/cate/add 增加新的分类
+     * @apiPermission ADMIN
+     * @apiHeader Authorization JWT token
      * @apiVersion 0.0.1
      * @apiGroup cate
      * @apiParam {String} name 分类名
      *
-     * @apiSuccess {Object[]}  articles 文章列表
-     * @apiSuccess {Number}    articles.id         id
-     * @apiSuccess {String}    articles.title      标题
-     * @apiSuccess {String}    articles.content    内容 (html)
-     * @apiSuccess {String}    articles.author     作者 (单纯用于显示)
-     * @apiSuccess {Object[]}  articles.cates      分类
-     * @apiSuccess {Object[]}  articles.tags       标签
-     * @apiSuccess {Number}    articles.createdAt  创建时间的时间戳
-     * @apiSuccess {Number}    articles.updatedAt  修改时间的时间戳
+     * @apiSuccess {Number}  id 分类id
+     * @apiSuccess {String} name 分类名
      *
      * @apiError {String} status 状态
      * @apiError {String} msg 错误信息
@@ -145,7 +146,7 @@ public class CateController {
         }
         if (cateRepository.getOneByName(name) != null) {
             json.put("status", "error");
-            json.put("msg", "cate is exist");
+            json.put("msg", "cate has existed");
             return new ResponseEntity(json, HttpStatus.OK);
         }
 
@@ -153,7 +154,14 @@ public class CateController {
         cate.setName(name);
 
         cateRepository.save(cate);
-
+        ArrayList<String> type = new ArrayList();
+        type.add("photo");
+        type.add("video");
+        type.add("anime");
+        for (String t : type) {
+            File dir = resourceService.getLocalFileByPath(t + "/" + name);
+            dir.mkdir();
+        }
         return new ResponseEntity(cate, HttpStatus.OK);
     }
 }

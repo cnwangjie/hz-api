@@ -269,6 +269,19 @@ public class ResourceController {
         return new ResponseEntity(json, HttpStatus.OK);
     }
 
+    /**
+     * @api {post} /api/resource/tts 语音合成
+     * @apiVersion 0.0.1
+     * @apiGroup resource
+     * @apiParam {Number} [articleid] 文章id
+     * @apiParam {String} [text] 要转换文字 (二选一)
+     *
+     * @apiSuccess {String} status 状态
+     * @apiSuccess {String} soundpath 音频文件地址
+     *
+     * @apiError {String} status 状态
+     * @apiError {String} msg 错误信息
+     */
     @RequestMapping(value = "/tts", method = RequestMethod.POST)
     public ResponseEntity tts(@RequestParam(value = "articleid", required = false) Integer id,
                               @RequestParam(value = "text", required = false) String text) throws IOException, NoSuchAlgorithmException {
